@@ -37,7 +37,7 @@ public:
 	~WVM();
 
 	// Run the VM
-	void interpret(std::vector<int> bytecode);
+	int interpret(std::vector<int> bytecode);
 	void executeFile(std::string filename);
 
 private:

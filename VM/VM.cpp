@@ -25,6 +25,7 @@ void WVM::executeFile(std::string filename) {
 			bytes.push_back(stoi(line));
 		}
 		file.close();
+		debug.LOG("bytecode successfully loaded from " + filename);
 	} else {
 		std::cout << "Error! could not open file!";
 	}
@@ -32,9 +33,9 @@ void WVM::executeFile(std::string filename) {
 }
 
 // run the bytecode
-void WVM::interpret(std::vector<int> bytecode) {
+int WVM::interpret(std::vector<int> bytecode) {
 	for (; ip != bytecode.size(); ip++) {
-		char instr = bytecode[ip];
+		int instr = bytecode[ip];
 		switch (instr) {
 			// case statements
 			case LITERAL: {
@@ -132,7 +133,7 @@ void WVM::interpret(std::vector<int> bytecode) {
 					#ifndef NDEBUG
 					ip = bytecode.size(); // Exit the loop instead of returning early so we still get our debug info
 					#else
-					return;
+					return -1;
 					#endif
 				}
 				int value = heap[addr];
@@ -149,8 +150,9 @@ void WVM::interpret(std::vector<int> bytecode) {
 					std::cout << "ERROR: Attempting to access value outside of heap!"; 
 					#ifndef NDEBUG
 					ip = bytecode.size(); // Exit the loop instead of returning early so we still get our debug info
+					break;
 					#else
-					return;
+					return -1;
 					#endif
 				}
 				push(stack[fp+offset]);
@@ -164,13 +166,13 @@ void WVM::interpret(std::vector<int> bytecode) {
 					heap.resize(fp + offset + 1);
 				}
 				heap[fp + offset] = value;
-				debug.LOG_VERBOSE("LOAD value added to heap " + std::to_string(heap[fp + offset]));
+				debug.LOG_VERBOSE("STORE value added to heap " + std::to_string(heap[fp + offset]));
 			} break;
 			case CALLF: {
-				// we expect all args to be on the heap
+				// we expect all args to be on the stack
 				int addr = bytecode[++ip]; // First, the address of the function
 				int argc = bytecode[++ip]; // Second, the number of arguments
-				debug.LOG_VERBOSE("CALLF operands " + std::to_string(addr) + " " + std::to_string(argc));
+				debug.LOG_VERBOSE("CALLF operands address: " + std::to_string(addr) + " number of args (on stack): " + std::to_string(argc));
 				push(argc); // So we know how many args to pop
 				push(fp); // So we can return to the current heap location
 				push(ip); // So we can return to the current instruction being performed
@@ -222,9 +224,13 @@ void WVM::interpret(std::vector<int> bytecode) {
 			}
 			default:
 				std::cout << "Unimplemented instruction type! " << bytecode[ip] << "\n";
+				// TODO - Throw exception?
 				break;
 		}
 	}
+	
+	int retVal = 0;
+	if (!stack.empty()) retVal = stack.back();
 
 	#ifndef NDEBUG
 	if (!stack.empty()) {
@@ -232,9 +238,11 @@ void WVM::interpret(std::vector<int> bytecode) {
 			std::cout << pop() << "\n";
 		}
 	}
-	#endif
 
 	debug.printToFile();
+	#endif
+
+	return retVal;
 }
 
 void WVM::push(int val) {
@@ -249,4 +257,5 @@ int WVM::pop() {
 	} catch (const std::out_of_range& oor) {
 		debug.printToFile();
 	}
+	return -1;
 }

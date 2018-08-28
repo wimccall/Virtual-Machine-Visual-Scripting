@@ -1,0 +1,12 @@
+{
+	"name": "visual-scripting",
+	"version": "0.0.0",
+	"description": "VisualScripting",
+	"main": "app.js",
+	"author": {
+		"name": "WadeMcCall"
+	},
+	"dependencies": {
+		"electron": "^2.0.8"
+	}
+}
