@@ -30,7 +30,7 @@ int VMFibonacciImp(int fibArg) {
 		END_FUN, // function delimeter
 		// Main () {
 		LITERAL, fibArg, // put our arg
-		CALLF, fib, 1, // Call fib(6)
+		CALLF, fib, 1, // Call fib(fibArg)
 		// End. 
 	};
 	return vm.interpret(fibonacci);

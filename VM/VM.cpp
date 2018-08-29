@@ -4,8 +4,6 @@ WVM::WVM()
 : debug("WVM_Debug_log.txt")
 {
 	debug.immediatelyPrintLogs();
-	ip = 0;
-	fp = 0;
 }
 
 

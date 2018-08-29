@@ -47,8 +47,8 @@ private:
 
 	std::vector<int> stack; // Memory stack
 	std::vector<int> heap; // Memory heap
-	int fp; // Frame pointer
-	std::vector<int>::size_type ip; // Instruction pointer
+	int fp = 0; // Frame pointer
+	std::vector<int>::size_type ip = 0; // Instruction pointer
 	std::map<std::string, int> labels; // labels for control flow instructions <Label name, pointer position>
 
 	// For debugging
